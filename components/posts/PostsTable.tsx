@@ -1,64 +1,75 @@
 import React from 'react'
-import { Table, TableBody,TableCaption, TableCell, TableHeader, TableRow,TableHead  } from "@/components/ui/table";
+import { Table, TableBody, TableCaption, TableCell, TableHeader, TableRow, TableHead } from "@/components/ui/table";
 import Link from 'next/link';
 import posts from '@/Data/posts';
-import {Post} from '@/types/posts';
+import { Post } from '@/types/posts';
 import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { format } from 'date-fns';
 
 interface PostsTableProps {
-    limit?: number;
-    title?: string;
+  limit?: number;
+  title?: string;
 }
-function PostsTable( {limit, title }: PostsTableProps) {
-    const sortedPosts = posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    const filteredPosts = limit ? sortedPosts.slice(0, limit) : sortedPosts;
-    
+
+function PostsTable({ limit, title }: PostsTableProps) {
+  const sortedPosts = posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const filteredPosts = limit ? sortedPosts.slice(0, limit) : sortedPosts;
+
   return (
-
-    <div className='mt-10'>
-      <h2 className='text-2xl font-bold text-slate-600 dark:text-slate-300 mb-4'>{title ? title: 'Fuel Price //posts'}</h2>
-
+    <div className="rounded-md border">
+      <div className="p-4">
+        <h2 className="text-2xl font-semibold tracking-tight">{title ? title : 'Fuel Prices'}</h2>
+        <p className="text-sm text-muted-foreground">Manage and track fuel prices across stations</p>
+      </div>
       <Table>
-        <TableCaption>A list of all posts</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className=''>Title</TableHead>
-            <TableHead className='hidden md:table-cell'>Author</TableHead>
-            <TableHead className='hidden md:table-cell '>Date</TableHead>
-            <TableHead>Edit</TableHead>
-            <TableHead>Delete</TableHead>
-            
+            <TableHead className="w-[300px]">Title</TableHead>
+            <TableHead className="hidden md:table-cell">Author</TableHead>
+            <TableHead className="hidden md:table-cell">Date</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredPosts.map((post: Post) => (
+            <TableRow key={post.id} className="group">
+              <TableCell className="font-medium">
+                <Link href={`/posts/${post.id}`} className="hover:underline">
+                  {post.title}
+                </Link>
+              </TableCell>
+              <TableCell className="hidden md:table-cell">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
+                  {post.author}
+                </div>
+              </TableCell>
+              <TableCell className="hidden md:table-cell">
+                {format(new Date(post.date), 'MMM dd, yyyy')}
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end gap-2">
+                  <Link href={`/posts/edit/${post.id}`}>
+                    <Button variant="outline" size="sm" className="h-8 gap-1">
+                      <span className="sr-only">Edit</span>
+                      Edit
+                    </Button>
+                  </Link>
+                  <Link href={`/posts/delete/${post.id}`}>
+                    <Button variant="destructive" size="sm" className="h-8 gap-1">
+                      <span className="sr-only">Delete</span>
+                      Delete
+                    </Button>
+                  </Link>
+                </div>
+              </TableCell>
             </TableRow>
-
-            </TableHeader>
-            <TableBody>
-            {filteredPosts.slice(0, limit).map((post: Post) => (
-              <TableRow key={post.id} className='hover:bg-slate-200 dark:hover:bg-slate-700'>   
-                <TableCell className='font-medium text-slate-600 dark:text-slate-300'>
-                  <Link href={`/posts/${post.id}`}>
-                    {post.title}
-                  </Link>
-                </TableCell>
-                <TableCell className='hidden md:table-cell'>{post.author}</TableCell>
-                <TableCell className='hidden md:table-cell'>{post.date}</TableCell>
-                <TableCell>
-                  <Link href={`/posts/edit/${post.id}`} className='text-blue-500 hover:text-blue-700'>
-                   <Button className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors'> Edit </Button>
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Link href={`/posts/delete/${post.id}`} className='text-red-500 hover:text-red-700'>
-                   <Button className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors'> Delete </Button>
-                  </Link>
-                </TableCell>
-                
-              </TableRow>
-            ))}
-            </TableBody>
+          ))}
+        </TableBody>
       </Table>
-      
     </div>
-  )
+  );
 }
 
 export default PostsTable;

@@ -10,35 +10,68 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
+import { Bell, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 const Navbar = () => {
   return (
-    <div className='bg-primary dark:bg-slate-700 text-white py-2 px-5 flex justify-between'>
-      <Link href='/'>
-        <Image src={logo} alt='TraversyPress' width={40} />
-      </Link>
-
-      <div className='flex items-center'>
+    <div className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+      <div className='flex h-16 items-center px-4'>
+        <div className='flex items-center gap-4'>
+          <Link href='/'>
+            <Image src={logo} alt='FuelTracker' width={40} className='rounded-lg' />
+          </Link>
+          <div className='relative hidden md:block'>
+            <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+            <Input
+              placeholder='Search...'
+              className='pl-8 w-[300px]'
+            />
+          </div>
+        </div>
         
-        <DropdownMenu>
-          <DropdownMenuTrigger className='focus:outline-none'>
-            <Avatar>
-              <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' />
-              <AvatarFallback className='text-black'>BT</AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href='/profile'>Profile</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href='/auth'>Logout</Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className='ml-auto flex items-center gap-4'>
+          <button className='relative rounded-full p-2 hover:bg-accent'>
+            <Bell className='h-5 w-5' />
+            <span className='absolute right-1 top-1 h-2 w-2 rounded-full bg-primary'></span>
+          </button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger className='focus:outline-none'>
+              <Avatar className='h-8 w-8 cursor-pointer border-2 border-primary'>
+                <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' />
+                <AvatarFallback className='bg-primary text-primary-foreground'>BT</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end' className='w-56'>
+              <DropdownMenuLabel className='font-normal'>
+                <div className='flex flex-col space-y-1'>
+                  <p className='text-sm font-medium leading-none'>Brad Traversy</p>
+                  <p className='text-xs leading-none text-muted-foreground'>
+                    brad@example.com
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link href='/profile' className='flex w-full items-center'>
+                  Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href='/settings' className='flex w-full items-center'>
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link href='/auth' className='flex w-full items-center text-destructive'>
+                  Logout
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </div>
   );
