@@ -1,19 +1,7 @@
-import React from 'react'
+import React from 'react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command"
-import Link
- from 'next/link'
-
-import { 
   LayoutDashboard,
   Newspaper,
   Folders,
@@ -21,59 +9,112 @@ import {
   Settings,
   Receipt,
   Fuel,
-  User, } from 'lucide-react'
+  User,
+} from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 function Sidebar() {
   return (
-    <Command className='bg-secondary rounded-none'>
-  <CommandInput placeholder="Type a command or search..." />
-  <CommandList>
-    <CommandEmpty>No results found.</CommandEmpty>
-    <CommandGroup heading="Suggestions">
-      <CommandItem>
-        <LayoutDashboard className="mr-2 h-4 w-4" />
-        <Link href="/">
-          Dashboard
-        </Link>
-      </CommandItem>
-      <CommandItem> 
-        <Receipt className="mr-2 h-4 w-4" />
-        <Link href="/posts">
-         Fuel Price
-        </Link></CommandItem>
+    <div className="h-full w-64 border-r bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Branding Section */}
+      <div className="mb-6 px-2">
+        <h1 className="text-xl font-semibold tracking-tight">FuelTracker</h1>
+        <p className="text-sm text-muted-foreground">Energy Management Suite</p>
+      </div>
 
-      <CommandItem>
+      <Separator className="mb-4" />
 
-      <Fuel className="mr-2 h-4 w-4" />
-        <Link href=" #">
-           Fuel Stations
-        </Link>
-      </CommandItem>
-    </CommandGroup>
-    <CommandSeparator />
-    <CommandGroup heading="Settings">
-      <CommandItem>
-        <User className="mr-2 h-4 w-4" />
-        <span>Profile</span>
-        <CommandShortcut>⌘P</CommandShortcut>
+      {/* Navigation Groups */}
+      <nav className="space-y-1">
+        <div className="space-y-2">
+          <p className="px-4 text-xs font-medium text-muted-foreground">Navigation</p>
+          <div className="space-y-1">
+            <Link
+              href="/"
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent'
+              )}
+            >
+              <LayoutDashboard className="h-5 w-5" />
+              Dashboard
+            </Link>
+            <Link
+              href="/posts"
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent'
+              )}
+            >
+              <Receipt className="h-5 w-5" />
+              Fuel Prices
+            </Link>
+            <Link
+              href="#"
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent'
+              )}
+            >
+              <Fuel className="h-5 w-5" />
+              Stations
+              <span className="ml-auto rounded-full bg-primary/10 px-2 py-1 text-xs text-primary">
+                Soon
+              </span>
+            </Link>
+          </div>
+        </div>
 
-      </CommandItem>
-      <CommandItem>
-        <CreditCard className="mr-2 h-4 w-4" />
-        <span>Payment</span>
-        <CommandShortcut>⌘P</CommandShortcut>
+        <Separator className="my-4" />
 
-      </CommandItem>
-      <CommandItem>
-        <Settings className="mr-2 h-4 w-4" />
-        <span>Settings</span>
-        <CommandShortcut>⌘S</CommandShortcut>
-      </CommandItem>
-    </CommandGroup>
-  </CommandList>
-</Command>
-  
-  )
+        <div className="space-y-2">
+          <p className="px-4 text-xs font-medium text-muted-foreground">Account</p>
+          <div className="space-y-1">
+            <Link
+              href="#"
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent'
+              )}
+            >
+              <User className="h-5 w-5" />
+              Profile
+            </Link>
+            <Link
+              href="#"
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent'
+              )}
+            >
+              <CreditCard className="h-5 w-5" />
+              Billing
+            </Link>
+            <Link
+              href="#"
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent'
+              )}
+            >
+              <Settings className="h-5 w-5" />
+              Settings
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Footer Section */}
+      <div className="absolute bottom-4 left-4 right-4 text-xs text-muted-foreground">
+        <Separator className="mb-2" />
+        <div className="flex justify-between px-2">
+          <span>v1.2.0</span>
+          <span>© 2024 FuelTracker</span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-export default Sidebar
+export default Sidebar;
