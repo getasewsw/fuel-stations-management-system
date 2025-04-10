@@ -57,7 +57,7 @@ function Sidebar() {
               )}
             >
               <Fuel className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              <span>Stations</span>
+              <span>Fuel Stations</span>
               <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
             </Link>
             <Link
