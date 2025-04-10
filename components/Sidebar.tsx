@@ -50,7 +50,7 @@ function Sidebar() {
               <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
             </Link>
             <Link
-              href="/stations"
+              href="/fuel-stations"
               className={cn(
                 buttonVariants({ variant: 'ghost' }),
                 'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent group'

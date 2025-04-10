@@ -2,47 +2,72 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-const posts = [
-  {
-    title: 'The Rise of Artificial Intelligence',
-    body: 'Artificial Intelligence (AI) is revolutionizing various industries...',
-    author: 'John Doe',
-    date: '2024-05-01',
-    comments: [
-      { text: 'Great introduction!', username: 'Jane' },
-      { text: 'Looking forward to more posts on this topic.', username: 'Alex' },
-    ],
-  },
-  {
-    title: 'Quantum Computing: A New Era of Computing',
-    body: 'Quantum computing holds the potential to solve problems...',
-    author: 'Emily Smith',
-    date: '2024-04-28',
-    comments: [
-      { text: 'Fascinating read!', username: 'Mark' },
-      { text: 'I have some questions about quantum algorithms.', username: 'Sarah' },
-    ],
-  },
-  // Add more posts as needed
-]
-
 async function main() {
-  for (const post of posts) {
-    await prisma.post.create({
+  // Create regions
+  const regions = await Promise.all([
+    prisma.region.create({
       data: {
-        title: post.title,
-        body: post.body,
-        author: post.author,
-        date: post.date,
-        comments: {
-          create: post.comments.map(comment => ({
-            text: comment.text,
-            username: comment.username,
-          })),
-        },
+        code: 'AA',
+        name: 'Addis Ababa',
       },
-    })
-  }
+    }),
+    prisma.region.create({
+      data: {
+        code: 'OR',
+        name: 'Oromia',
+      },
+    }),
+  ])
+
+  // Create fuel companies
+  const fuelCompanies = await Promise.all([
+    prisma.fuelCompany.create({
+      data: {
+        code: 'TOTAL',
+        name: 'Total Ethiopia',
+      },
+    }),
+    prisma.fuelCompany.create({
+      data: {
+        code: 'NOC',
+        name: 'National Oil Company',
+      },
+    }),
+  ])
+
+  // Create fuel stations
+  await Promise.all([
+    prisma.fuelStation.create({
+      data: {
+        merchantId: 'MER001',
+        name: 'Total Bole',
+        zone: 'Bole',
+        woreda: 'Bole',
+        kebele: '22',
+        city: 'Addis Ababa',
+        regionId: regions[0].id,
+        fuelCompanyId: fuelCompanies[0].id,
+        known_name: 'Total Bole Branch',
+        latitude: 8.9806,
+        longitude: 38.7578,
+      },
+    }),
+    prisma.fuelStation.create({
+      data: {
+        merchantId: 'MER002',
+        name: 'NOC Mexico',
+        zone: 'Mexico',
+        woreda: 'Mexico',
+        kebele: '15',
+        city: 'Addis Ababa',
+        regionId: regions[0].id,
+        fuelCompanyId: fuelCompanies[1].id,
+        known_name: 'NOC Mexico Branch',
+        latitude: 8.9956,
+        longitude: 38.7894,
+      },
+    }),
+  ])
 }
 
 main()

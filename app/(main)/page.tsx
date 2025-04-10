@@ -5,20 +5,28 @@ import {Button} from "@/components/ui/button";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import { Flame, Fuel, LucideIcon, MessageCircle, User } from 'lucide-react';
 import {Newspaper, Receipt} from 'lucide-react'
-import StationsTable from "@/components/stations/StationsTable";
+import FuelStationsTable from "@/components/FuelStationsTable";
 import AnalyticsCharts from "@/components/dashboard/AnalyticsCharts";
 
 interface Station {
   id: number
-  merchant_id: string
+  merchantId: string
   name: string
   zone: string
   woreda: string
   city: string
-  region_id: string
-  fuel_company_id: string
-  gasoline_price?: number
-  gasoil_price?: number
+  regionId: number
+  fuelCompanyId: number
+  region: {
+    id: number
+    code: string
+    name: string
+  }
+  fuelCompany: {
+    id: number
+    code: string
+    name: string
+  }
 }
 
 export default function Home() {
@@ -29,7 +37,7 @@ export default function Home() {
     const fetchStations = async () => {
       try {
         console.log('Fetching stations...')
-        const response = await fetch('/api/stations')
+        const response = await fetch('/api/fuel-stations')
         const data = await response.json()
         console.log('Fetched stations:', data)
         setStations(Array.isArray(data) ? data : [])
@@ -73,7 +81,7 @@ export default function Home() {
         />
       </div>
 
-      <StationsTable stations={stations} title="Latest Stations" limit={5} />
+      <FuelStationsTable />
       <AnalyticsCharts />
     </>
   );
