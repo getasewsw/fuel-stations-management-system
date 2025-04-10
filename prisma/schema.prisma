@@ -10,41 +10,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Station {
-  id              Int      @id @default(autoincrement())
-  merchant_id     String
-  name            String
-  zone            String
-  woreda          String
-  city            String
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-  region_id       String
-  fuel_company_id String
-  gasoline_price  Float?
-  gasoil_price    Float?
-  tanks           Tank[]
-  transactions    Transaction[]
+model FuelStation {
+  id            Int         @id @default(autoincrement())
+  merchantId    String      @map("merchant_id")
+  name          String
+  zone          String
+  woreda        String
+  kebele        String
+  city          String
+  regionId      Int         @map("region_id")
+  region        Region      @relation(fields: [regionId], references: [id])
+  fuelCompanyId Int         @map("fuel_company_id")
+  known_name    String?     @map("known_name")
+  latitude      Float?      @map("latitude")
+  longitude     Float?      @map("longitude")
+  fuelCompany   FuelCompany @relation(fields: [fuelCompanyId], references: [id])
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  FuelPrice     FuelPrice[]
+
+  @@map("fuel_station")
 }
 
-model Tank {
-  id          Int      @id @default(autoincrement())
-  stationId   Int
-  station     Station  @relation(fields: [stationId], references: [id])
-  capacity    Float
-  fuelType    String
-  currentLevel Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Region {
+  id           Int           @id @default(autoincrement())
+  code         String
+  name         String
+  fuelStations FuelStation[]
+
+  @@map("region")
 }
 
-model Transaction {
-  id          Int      @id @default(autoincrement())
-  stationId   Int
-  station     Station  @relation(fields: [stationId], references: [id])
-  amount      Float
-  price       Float
-  type        String   // "IN" or "OUT"
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model FuelCompany {
+  id           Int           @id @default(autoincrement())
+  code         String
+  name         String
+  fuelStations FuelStation[]
+
+  @@map("fuel_company")
+}
+
+model FuelPrice {
+  id            Int         @id @default(autoincrement())
+  fuelStationId Int         @map("fuel_station_id")
+  fuelStation   FuelStation @relation(fields: [fuelStationId], references: [id])
+  gasolinePrice Float?      @map("gasoline_price")
+  gasoilPrice   Float?      @map("gasoil_price")
+  lfoPrice      Float?      @map("lfo_price")
+  hfoPrice      Float?      @map("hfo_price")
+  kerosenePrice Float?      @map("kerosene_price")
+  startDate     DateTime?   @map("start_date")
+  endDate       DateTime?   @map("end_date")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  @@map("fuel_price")
 }
