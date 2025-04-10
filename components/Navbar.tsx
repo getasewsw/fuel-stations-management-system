@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import logo from '../img/next.svg';
 import { ThemeToggler } from '@/components/ThemeToggler';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -19,8 +18,11 @@ const Navbar = () => {
     <div className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
       <div className='flex h-16 items-center px-4'>
         <div className='flex items-center gap-4'>
-          <Link href='/'>
-            <Image src={logo} alt='FuelTracker' width={40} className='rounded-lg' />
+          <Link href='/' className='flex items-center gap-2'>
+            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground'>
+              <span className='text-lg font-bold'>F</span>
+            </div>
+            <span className='font-semibold'>FuelTracker</span>
           </Link>
           <div className='relative hidden md:block'>
             <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
@@ -39,43 +41,41 @@ const Navbar = () => {
           <div className="flex items-center">
             <ThemeToggler/>
             <DropdownMenu>
-            <DropdownMenuTrigger className='focus:outline-none'>
-              <Avatar className='h-8 w-8 cursor-pointer border-2 border-primary'>
-                <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' />
-                <AvatarFallback className='bg-primary text-primary-foreground'>BT</AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-56'>
-              <DropdownMenuLabel className='font-normal'>
-                <div className='flex flex-col space-y-1'>
-                  <p className='text-sm font-medium leading-none'> Naod</p>
-                  <p className='text-xs leading-none text-muted-foreground'>
-                    Naod@example.com
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Link href='/profile' className='flex w-full items-center'>
-                  Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href='/settings' className='flex w-full items-center'>
-                  Settings
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Link href='/auth' className='flex w-full items-center text-destructive'>
-                  Logout
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+              <DropdownMenuTrigger className='focus:outline-none'>
+                <Avatar className='h-8 w-8 cursor-pointer border-2 border-primary'>
+                  <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' />
+                  <AvatarFallback className='bg-primary text-primary-foreground'>BT</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end' className='w-56'>
+                <DropdownMenuLabel className='font-normal'>
+                  <div className='flex flex-col space-y-1'>
+                    <p className='text-sm font-medium leading-none'>Naod</p>
+                    <p className='text-xs leading-none text-muted-foreground'>
+                      naod@example.com
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Link href='/profile' className='flex w-full items-center'>
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href='/settings' className='flex w-full items-center'>
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Link href='/auth' className='flex w-full items-center text-destructive'>
+                    Logout
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-         
         </div>
       </div>
     </div>
