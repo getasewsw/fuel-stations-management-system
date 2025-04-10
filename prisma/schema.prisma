@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Station {
+  id              Int      @id @default(autoincrement())
+  merchant_id     String
+  name            String
+  zone            String
+  woreda          String
+  city            String
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  region_id       String
+  fuel_company_id String
+  gasoline_price  Float?
+  gasoil_price    Float?
+  tanks           Tank[]
+  transactions    Transaction[]
+}
+
+model Tank {
+  id          Int      @id @default(autoincrement())
+  stationId   Int
+  station     Station  @relation(fields: [stationId], references: [id])
+  capacity    Float
+  fuelType    String
+  currentLevel Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  stationId   Int
+  station     Station  @relation(fields: [stationId], references: [id])
+  amount      Float
+  price       Float
+  type        String   // "IN" or "OUT"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -1,11 +1,12 @@
-import React from 'react'
+'use client';
+import React, { useEffect, useState } from 'react'
 import { Table, TableBody, TableCaption, TableCell, TableHeader, TableRow, TableHead } from "@/components/ui/table";
 import Link from 'next/link';
-import posts from '@/Data/posts';
 import { Post } from '@/types/posts';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 interface PostsTableProps {
   limit?: number;
@@ -13,8 +14,48 @@ interface PostsTableProps {
 }
 
 function PostsTable({ limit, title }: PostsTableProps) {
-  const sortedPosts = posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch('/api/posts');
+      const data = await response.json();
+      setPosts(data);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      try {
+        const response = await fetch(`/api/posts/${id}`, {
+          method: 'DELETE',
+        });
+        if (response.ok) {
+          fetchPosts(); // Refresh the posts list
+          router.refresh();
+        }
+      } catch (error) {
+        console.error('Error deleting post:', error);
+      }
+    }
+  };
+
+  const sortedPosts = [...posts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const filteredPosts = limit ? sortedPosts.slice(0, limit) : sortedPosts;
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="rounded-md border">
@@ -56,12 +97,15 @@ function PostsTable({ limit, title }: PostsTableProps) {
                       Edit
                     </Button>
                   </Link>
-                  <Link href={`/posts/delete/${post.id}`}>
-                    <Button variant="destructive" size="sm" className="h-8 gap-1">
-                      <span className="sr-only">Delete</span>
-                      Delete
-                    </Button>
-                  </Link>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="h-8 gap-1"
+                    onClick={() => handleDelete(post.id)}
+                  >
+                    <span className="sr-only">Delete</span>
+                    Delete
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
