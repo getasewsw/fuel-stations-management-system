@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import logo from '../img/next.svg';
+import { ThemeToggler } from '@/components/ThemeToggler';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -35,8 +36,9 @@ const Navbar = () => {
             <Bell className='h-5 w-5' />
             <span className='absolute right-1 top-1 h-2 w-2 rounded-full bg-primary'></span>
           </button>
-          
-          <DropdownMenu>
+          <div className="flex items-center">
+            <ThemeToggler/>
+            <DropdownMenu>
             <DropdownMenuTrigger className='focus:outline-none'>
               <Avatar className='h-8 w-8 cursor-pointer border-2 border-primary'>
                 <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' />
@@ -71,6 +73,9 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          </div>
+         
         </div>
       </div>
     </div>
