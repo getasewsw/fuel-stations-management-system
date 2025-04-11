@@ -7,9 +7,13 @@ export async function GET() {
       include: {
         fuelStation: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
     return NextResponse.json(fuelPrices);
   } catch (error) {
+    console.error("Error fetching fuel prices:", error);
     return NextResponse.json(
       { error: "Failed to fetch fuel prices" },
       { status: 500 }
@@ -19,21 +23,25 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const data = await request.json();
     const fuelPrice = await prisma.fuelPrice.create({
       data: {
-        fuelStationId: parseInt(body.fuelStationId),
-        gasolinePrice: body.gasolinePrice ? parseFloat(body.gasolinePrice) : null,
-        gasoilPrice: body.gasoilPrice ? parseFloat(body.gasoilPrice) : null,
-        lfoPrice: body.lfoPrice ? parseFloat(body.lfoPrice) : null,
-        hfoPrice: body.hfoPrice ? parseFloat(body.hfoPrice) : null,
-        kerosenePrice: body.kerosenePrice ? parseFloat(body.kerosenePrice) : null,
-        startDate: body.startDate ? new Date(body.startDate) : null,
-        endDate: body.endDate ? new Date(body.endDate) : null,
+        fuelStationId: parseInt(data.fuelStationId),
+        gasolinePrice: data.gasolinePrice,
+        gasoilPrice: data.gasoilPrice,
+        lfoPrice: data.lfoPrice,
+        hfoPrice: data.hfoPrice,
+        kerosenePrice: data.kerosenePrice,
+        startDate: data.startDate ? new Date(data.startDate) : null,
+        endDate: data.endDate ? new Date(data.endDate) : null,
+      },
+      include: {
+        fuelStation: true,
       },
     });
     return NextResponse.json(fuelPrice);
   } catch (error) {
+    console.error("Error creating fuel price:", error);
     return NextResponse.json(
       { error: "Failed to create fuel price" },
       { status: 500 }
