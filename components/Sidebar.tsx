@@ -60,26 +60,17 @@ function Sidebar() {
               <span>Fuel Stations</span>
               <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
             </Link>
+         
+              
             <Link
-              href="/tanks"
+              href="/fuel-prices"
               className={cn(
                 buttonVariants({ variant: 'ghost' }),
                 'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent group'
               )}
             >
               <Receipt className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              <span>Tanks</span>
-              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
-            </Link>
-            <Link
-              href="/transactions"
-              className={cn(
-                buttonVariants({ variant: 'ghost' }),
-                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent group'
-              )}
-            >
-              <Receipt className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              <span>Transactions</span>
+              <span>Fuel Prices</span>
               <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
             </Link>
           </div>
