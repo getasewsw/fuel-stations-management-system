@@ -1,46 +1,48 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import StationForm from '@/components/stations/StationForm'
+import FuelStationForm from '@/components/FuelStationForm'
 
 interface Station {
   id: number
-  merchant_id: string
+  merchantId: string
   name: string
   zone: string
   woreda: string
   kebele: string
-  specific_location: string
   city: string
-  created_at: string
-  updated_at: string
-  region_id: string
-  fuel_company_id: string
+  regionId: number
+  fuelCompanyId: number
   known_name?: string
-  latitude: number
-  longitude: number
-  gasoline_price?: number
-  gasoil_price?: number
-  kerosene_price?: number
-  lfo_price?: number
-  hfo_price?: number
+  latitude?: number
+  longitude?: number
+  createdAt: string
+  updatedAt: string
+  isDeleted: boolean
 }
 
 export default function EditStationPage() {
   const params = useParams()
+  const router = useRouter()
   const [station, setStation] = useState<Station | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchStation = async () => {
       try {
-        const response = await fetch(`/api/stations/${params.id}`)
+        const response = await fetch(`/api/fuel-stations/${params.id}`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch station')
+        }
         const data = await response.json()
+        console.log('Fetched station data:', data)
         setStation(data)
       } catch (error) {
         console.error('Error fetching station:', error)
+        setError('Failed to load station data')
       } finally {
         setLoading(false)
       }
@@ -51,6 +53,10 @@ export default function EditStationPage() {
 
   if (loading) {
     return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>
   }
 
   if (!station) {
@@ -64,7 +70,10 @@ export default function EditStationPage() {
           <CardTitle>Edit Station</CardTitle>
         </CardHeader>
         <CardContent>
-          <StationForm station={station} isEditing />
+          <FuelStationForm 
+            initialData={station} 
+            onSuccess={() => router.push('/stations')}
+          />
         </CardContent>
       </Card>
     </div>

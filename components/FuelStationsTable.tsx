@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -23,6 +24,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/components/ui/use-toast";
+import FuelStationEditModal from "@/components/FuelStationEditModal";
 
 interface FuelStation {
   id: number;
@@ -39,6 +41,7 @@ interface FuelStation {
   longitude: number | null;
   createdAt: string;
   updatedAt: string;
+  isDeleted: boolean;
   region: {
     name: string;
   };
@@ -48,8 +51,11 @@ interface FuelStation {
 }
 
 export default function FuelStationsTable() {
+  const router = useRouter();
   const [fuelStations, setFuelStations] = useState<FuelStation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedStation, setSelectedStation] = useState<FuelStation | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -75,6 +81,19 @@ export default function FuelStationsTable() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleEdit = (station: FuelStation) => {
+    setSelectedStation(station);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    fetchFuelStations();
+    toast({
+      title: "Success",
+      description: "Fuel station updated successfully",
+    });
   };
 
   const handleDelete = async (id: number) => {
@@ -105,88 +124,106 @@ export default function FuelStationsTable() {
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Merchant ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Known Name</TableHead>
-            <TableHead>City</TableHead>
-            <TableHead>Zone</TableHead>
-            <TableHead>Woreda</TableHead>
-            <TableHead>Kebele</TableHead>
-            <TableHead>Region ID</TableHead>
-            <TableHead>Region</TableHead>
-            <TableHead>Company ID</TableHead>
-            <TableHead>Company</TableHead>
-            <TableHead>Coordinates</TableHead>
-            <TableHead>Created</TableHead>
-            <TableHead>Updated</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {fuelStations.length === 0 ? (
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={15} className="text-center">
-                No fuel stations found
-              </TableCell>
+              <TableHead>Merchant ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Known Name</TableHead>
+              <TableHead>City</TableHead>
+              <TableHead>Zone</TableHead>
+              <TableHead>Woreda</TableHead>
+              <TableHead>Kebele</TableHead>
+              <TableHead>Region ID</TableHead>
+              <TableHead>Region</TableHead>
+              <TableHead>Company ID</TableHead>
+              <TableHead>Company</TableHead>
+              <TableHead>Coordinates</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead>Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ) : (
-            fuelStations.map((station) => (
-              <TableRow key={station.id}>
-                <TableCell className="font-medium">{station.merchantId}</TableCell>
-                <TableCell>{station.name}</TableCell>
-                <TableCell>{station.known_name || "-"}</TableCell>
-                <TableCell>{station.city}</TableCell>
-                <TableCell>{station.zone}</TableCell>
-                <TableCell>{station.woreda}</TableCell>
-                <TableCell>{station.kebele}</TableCell>
-                <TableCell>{station.regionId}</TableCell>
-                <TableCell>{station.region?.name || "N/A"}</TableCell>
-                <TableCell>{station.fuelCompanyId}</TableCell>
-                <TableCell>{station.fuelCompany?.name || "N/A"}</TableCell>
-                <TableCell>
-                  {station.latitude && station.longitude
-                    ? `${station.latitude.toFixed(4)}, ${station.longitude.toFixed(4)}`
-                    : "-"}
-                </TableCell>
-                <TableCell>{new Date(station.createdAt).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(station.updatedAt).toLocaleDateString()}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the fuel station.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(station.id)}>
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
+          </TableHeader>
+          <TableBody>
+            {fuelStations.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={15} className="text-center">
+                  No fuel stations found
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
+            ) : (
+              fuelStations.map((station) => (
+                <TableRow key={station.id}>
+                  <TableCell className="font-medium">{station.merchantId}</TableCell>
+                  <TableCell>{station.name}</TableCell>
+                  <TableCell>{station.known_name || "-"}</TableCell>
+                  <TableCell>{station.city}</TableCell>
+                  <TableCell>{station.zone}</TableCell>
+                  <TableCell>{station.woreda}</TableCell>
+                  <TableCell>{station.kebele}</TableCell>
+                  <TableCell>{station.regionId}</TableCell>
+                  <TableCell>{station.region?.name || "N/A"}</TableCell>
+                  <TableCell>{station.fuelCompanyId}</TableCell>
+                  <TableCell>{station.fuelCompany?.name || "N/A"}</TableCell>
+                  <TableCell>
+                    {station.latitude && station.longitude
+                      ? `${station.latitude.toFixed(4)}, ${station.longitude.toFixed(4)}`
+                      : "-"}
+                  </TableCell>
+                  <TableCell>{new Date(station.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>{new Date(station.updatedAt).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleEdit(station)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the fuel station.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(station.id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {selectedStation && (
+        <FuelStationEditModal
+          station={selectedStation}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedStation(null);
+          }}
+          onSuccess={handleEditSuccess}
+        />
+      )}
+    </>
   );
 } 

@@ -1,5 +1,8 @@
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { signOut, useSession } from 'next-auth/react';
 import { ThemeToggler } from '@/components/ThemeToggler';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -14,6 +17,12 @@ import { Bell, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const Navbar = () => {
+  const { data: session } = useSession();
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/auth/login' });
+  };
+
   return (
     <div className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
       <div className='flex h-16 items-center px-4'>
@@ -43,16 +52,18 @@ const Navbar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger className='focus:outline-none'>
                 <Avatar className='h-8 w-8 cursor-pointer border-2 border-primary'>
-                  <AvatarImage src='https://github.com/shadcn.png' alt='@shadcn' />
-                  <AvatarFallback className='bg-primary text-primary-foreground'>BT</AvatarFallback>
+                  <AvatarImage src={session?.user?.image || 'https://github.com/shadcn.png'} alt={session?.user?.name || 'User'} />
+                  <AvatarFallback className='bg-primary text-primary-foreground'>
+                    {session?.user?.name?.charAt(0) || 'U'}
+                  </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end' className='w-56'>
                 <DropdownMenuLabel className='font-normal'>
                   <div className='flex flex-col space-y-1'>
-                    <p className='text-sm font-medium leading-none'>Naod</p>
+                    <p className='text-sm font-medium leading-none'>{session?.user?.name || 'User'}</p>
                     <p className='text-xs leading-none text-muted-foreground'>
-                      naod@example.com
+                      {session?.user?.email || 'user@example.com'}
                     </p>
                   </div>
                 </DropdownMenuLabel>
@@ -68,10 +79,8 @@ const Navbar = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Link href='/auth' className='flex w-full items-center text-destructive'>
-                    Logout
-                  </Link>
+                <DropdownMenuItem onClick={handleLogout} className='text-destructive cursor-pointer'>
+                  Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

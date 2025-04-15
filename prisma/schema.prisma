@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,6 +5,17 @@ generator client {
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model FuelStation {
@@ -19,33 +27,38 @@ model FuelStation {
   kebele        String
   city          String
   regionId      Int         @map("region_id")
-  region        Region      @relation(fields: [regionId], references: [id])
   fuelCompanyId Int         @map("fuel_company_id")
   known_name    String?     @map("known_name")
   latitude      Float?      @map("latitude")
   longitude     Float?      @map("longitude")
-  fuelCompany   FuelCompany @relation(fields: [fuelCompanyId], references: [id])
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
+  isDeleted     Boolean     @default(false) @map("is_deleted")
   FuelPrice     FuelPrice[]
+  fuelCompany   FuelCompany @relation(fields: [fuelCompanyId], references: [id])
+  region        Region      @relation(fields: [regionId], references: [id])
 
   @@map("fuel_station")
 }
 
 model Region {
   id           Int           @id @default(autoincrement())
-  code         String
+  code         String        @unique
   name         String
   fuelStations FuelStation[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   @@map("region")
 }
 
 model FuelCompany {
   id           Int           @id @default(autoincrement())
-  code         String
+  code         String        @unique
   name         String
   fuelStations FuelStation[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   @@map("fuel_company")
 }
@@ -53,7 +66,6 @@ model FuelCompany {
 model FuelPrice {
   id            Int         @id @default(autoincrement())
   fuelStationId Int         @map("fuel_station_id")
-  fuelStation   FuelStation @relation(fields: [fuelStationId], references: [id])
   gasolinePrice Float?      @map("gasoline_price")
   gasoilPrice   Float?      @map("gasoil_price")
   lfoPrice      Float?      @map("lfo_price")
@@ -63,6 +75,19 @@ model FuelPrice {
   endDate       DateTime?   @map("end_date")
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
+  isDeleted     Boolean     @default(false) @map("is_deleted")
+  fuelStation   FuelStation @relation(fields: [fuelStationId], references: [id])
+  FuelType      FuelType?   @relation(fields: [fuelTypeId], references: [id])
+  fuelTypeId    Int?
 
   @@map("fuel_price")
+}
+
+model FuelType {
+  id         Int         @id @default(autoincrement())
+  code       String      @unique
+  name       String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  fuelPrices FuelPrice[]
 }

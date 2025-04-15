@@ -1,15 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
-  Newspaper,
-  Folders,
-  CreditCard,
-  Settings,
   Receipt,
   Fuel,
-  User,
   ChevronRight,
 } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
@@ -17,113 +13,70 @@ import { Separator } from '@/components/ui/separator';
 
 function Sidebar() {
   return (
-    <div className="h-full w-64 border-r bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="relative flex h-full w-64 flex-col border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Branding Section */}
-      <div className="mb-6 px-2">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <Fuel className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight">FuelTracker</h1>
-            <p className="text-xs text-muted-foreground">Energy Management Suite</p>
-          </div>
-        </div>
+      <div className="flex flex-col items-center px-6 py-8 border-b bg-gradient-to-b from-background to-background/80">
+        <Image
+          src="/ethio-telecom-logo.png"
+          alt="Ethio Telecom"
+          width={160}
+          height={53}
+          className="dark:brightness-200 transition-all duration-200 hover:scale-105"
+        />
+        <p className="mt-3 text-sm font-medium text-muted-foreground">
+          Fuel Station Management
+        </p>
       </div>
 
-      <Separator className="mb-4" />
-
       {/* Navigation Groups */}
-      <nav className="space-y-4">
-        <div className="space-y-2">
-          <p className="px-4 text-xs font-medium text-muted-foreground">Navigation</p>
-          <div className="space-y-1">
-            <Link
-              href="/"
-              className={cn(
-                buttonVariants({ variant: 'ghost' }),
-                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent group'
-              )}
-            >
-              <LayoutDashboard className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              <span>Dashboard</span>
-              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
-            </Link>
-            <Link
-              href="/fuel-stations"
-              className={cn(
-                buttonVariants({ variant: 'ghost' }),
-                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent group'
-              )}
-            >
-              <Fuel className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              <span>Fuel Stations</span>
-              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
-            </Link>
-         
-              
-            <Link
-              href="/fuel-prices"
-              className={cn(
-                buttonVariants({ variant: 'ghost' }),
-                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent group'
-              )}
-            >
-              <Receipt className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              <span>Fuel Prices</span>
-              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
-            </Link>
-          </div>
-        </div>
+      <nav className="flex-1 space-y-1 p-4">
+        <div className="space-y-1">
+          <Link
+            href="/"
+            className={cn(
+              buttonVariants({ variant: 'ghost' }),
+              'w-full justify-start gap-4 rounded-lg px-4 py-3 text-sm font-medium transition-all hover:bg-accent hover:text-accent-foreground group relative overflow-hidden'
+            )}
+          >
+            <div className="absolute inset-y-0 left-0 w-1 bg-primary transform origin-left scale-y-0 transition-transform group-hover:scale-y-100" />
+            <LayoutDashboard className="h-5 w-5 text-muted-foreground group-hover:text-primary shrink-0" />
+            <span>Dashboard</span>
+            <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary transition-transform group-hover:translate-x-1" />
+          </Link>
 
-        <Separator className="my-4" />
+          <Link
+            href="/stations"
+            className={cn(
+              buttonVariants({ variant: 'ghost' }),
+              'w-full justify-start gap-4 rounded-lg px-4 py-3 text-sm font-medium transition-all hover:bg-accent hover:text-accent-foreground group relative overflow-hidden'
+            )}
+          >
+            <div className="absolute inset-y-0 left-0 w-1 bg-primary transform origin-left scale-y-0 transition-transform group-hover:scale-y-100" />
+            <Fuel className="h-5 w-5 text-muted-foreground group-hover:text-primary shrink-0" />
+            <span>Fuel Stations</span>
+            <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary transition-transform group-hover:translate-x-1" />
+          </Link>
 
-        <div className="space-y-2">
-          <p className="px-4 text-xs font-medium text-muted-foreground">Account</p>
-          <div className="space-y-1">
-            <Link
-              href="#"
-              className={cn(
-                buttonVariants({ variant: 'ghost' }),
-                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent group'
-              )}
-            >
-              <User className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              <span>Profile</span>
-              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
-            </Link>
-            <Link
-              href="#"
-              className={cn(
-                buttonVariants({ variant: 'ghost' }),
-                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent group'
-              )}
-            >
-              <CreditCard className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              <span>Billing</span>
-              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
-            </Link>
-            <Link
-              href="#"
-              className={cn(
-                buttonVariants({ variant: 'ghost' }),
-                'w-full justify-start gap-3 rounded-lg px-4 transition-all hover:bg-accent group'
-              )}
-            >
-              <Settings className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              <span>Settings</span>
-              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary" />
-            </Link>
-          </div>
+          <Link
+            href="/fuel-prices"
+            className={cn(
+              buttonVariants({ variant: 'ghost' }),
+              'w-full justify-start gap-4 rounded-lg px-4 py-3 text-sm font-medium transition-all hover:bg-accent hover:text-accent-foreground group relative overflow-hidden'
+            )}
+          >
+            <div className="absolute inset-y-0 left-0 w-1 bg-primary transform origin-left scale-y-0 transition-transform group-hover:scale-y-100" />
+            <Receipt className="h-5 w-5 text-muted-foreground group-hover:text-primary shrink-0" />
+            <span>Fuel Prices</span>
+            <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
       </nav>
 
       {/* Footer Section */}
-      <div className="absolute bottom-4 left-4 right-4 text-xs text-muted-foreground">
-        <Separator className="mb-2" />
-        <div className="flex justify-between px-2">
+      <div className="border-t bg-muted/10 p-4">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>v1.2.0</span>
-          <span>© 2024 FuelTracker</span>
+          <span>© 2025 Ethio Telecom</span>
         </div>
       </div>
     </div>

@@ -1,43 +1,36 @@
 import type { Metadata } from "next";
-
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import { Toaster } from "@/components/ui/sonner";
-
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import { NextAuthProvider } from "@/components/providers/session-provider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: " Fuel Dahsboard",
-  description: " Fuel Dashboard",
+  title: "Fuel Station Management System",
+  description: "Manage your fuel stations efficiently",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) { 
+}) {
   return (
-   
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-         <ThemeProvider attribute='class'
-         defaultTheme='Light' enableSystem={false} 
-         storageKey="dashboard-theme">
-        {children}
-        <Toaster/>
-      </ThemeProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <NextAuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </NextAuthProvider>
       </body>
     </html>
   );

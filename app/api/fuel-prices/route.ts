@@ -3,17 +3,32 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    console.log("Fetching fuel prices...");
     const fuelPrices = await prisma.fuelPrice.findMany({
+      where: {
+        isDeleted: false,
+      },
       include: {
-        fuelStation: true,
+        fuelStation: {
+          select: {
+            name: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
     });
+    console.log("Found fuel prices:", fuelPrices.length);
     return NextResponse.json(fuelPrices);
   } catch (error) {
-    console.error("Error fetching fuel prices:", error);
+    console.error("Detailed error in GET /api/fuel-prices:", error);
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: `Failed to fetch fuel prices: ${error.message}` },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { error: "Failed to fetch fuel prices" },
       { status: 500 }

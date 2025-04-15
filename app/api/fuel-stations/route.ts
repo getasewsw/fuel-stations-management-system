@@ -3,14 +3,26 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    console.log("Fetching fuel stations...");
     const fuelStations = await prisma.fuelStation.findMany({
+      where: {
+        isDeleted: false,
+      },
       include: {
         region: true,
         fuelCompany: true,
       },
     });
+    console.log(`Found ${fuelStations.length} fuel stations`);
     return NextResponse.json(fuelStations);
   } catch (error) {
+    console.error("Detailed error in GET /api/fuel-stations:", error);
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: `Failed to fetch fuel stations: ${error.message}` },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { error: "Failed to fetch fuel stations" },
       { status: 500 }
@@ -38,6 +50,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(fuelStation);
   } catch (error) {
+    console.error("Error creating fuel station:", error);
     return NextResponse.json(
       { error: "Failed to create fuel station" },
       { status: 500 }

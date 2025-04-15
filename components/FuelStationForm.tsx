@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
   merchantId: z.string().min(1, "Merchant ID is required"),
@@ -58,9 +59,9 @@ interface FuelStationFormProps {
     city: string;
     regionId: number;
     fuelCompanyId: number;
-    known_name?: string;
-    latitude?: number;
-    longitude?: number;
+    known_name: string | null;
+    latitude: number | null;
+    longitude: number | null;
   };
   onSuccess?: () => void;
 }
@@ -72,6 +73,7 @@ export default function FuelStationForm({
   const [regions, setRegions] = useState<Region[]>([]);
   const [fuelCompanies, setFuelCompanies] = useState<FuelCompany[]>([]);
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -133,18 +135,30 @@ export default function FuelStationForm({
   }, [regions, fuelCompanies]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true);
     try {
       const url = initialData
         ? `/api/fuel-stations/${initialData.id}`
         : "/api/fuel-stations";
       const method = initialData ? "PUT" : "POST";
 
+      // Transform the values to match the API expectations
+      const transformedValues = {
+        ...values,
+        regionId: parseInt(values.regionId),
+        fuelCompanyId: parseInt(values.fuelCompanyId),
+        latitude: values.latitude ? parseFloat(values.latitude) : null,
+        longitude: values.longitude ? parseFloat(values.longitude) : null,
+      };
+
+      console.log("Submitting form with values:", transformedValues);
+
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(transformedValues),
       });
 
       if (response.ok) {
@@ -156,208 +170,205 @@ export default function FuelStationForm({
         });
         onSuccess?.();
       } else {
-        throw new Error("Failed to save fuel station");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save fuel station");
       }
     } catch (error) {
+      console.error("Error submitting form:", error);
       toast({
         title: "Error",
-        description: "Failed to save fuel station",
+        description: error instanceof Error ? error.message : "Failed to save fuel station",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="merchantId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Merchant ID</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter merchant ID" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter station name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="zone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Zone</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter zone" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="woreda"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Woreda</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter woreda" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="kebele"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Kebele</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter kebele" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>City</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter city" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="regionId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Region</FormLabel>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="merchantId" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Merchant ID
+            </Label>
+            <Input
+              id="merchantId"
+              value={form.watch("merchantId")}
+              onChange={(e) => form.setValue("merchantId", e.target.value)}
+              className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              placeholder="Enter merchant ID"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Name
+            </Label>
+            <Input
+              id="name"
+              value={form.watch("name")}
+              onChange={(e) => form.setValue("name", e.target.value)}
+              className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              placeholder="Enter station name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="knownName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Known Name
+            </Label>
+            <Input
+              id="knownName"
+              value={form.watch("known_name")}
+              onChange={(e) => form.setValue("known_name", e.target.value)}
+              className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              placeholder="Enter known name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="zone" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Zone
+            </Label>
+            <Input
+              id="zone"
+              value={form.watch("zone")}
+              onChange={(e) => form.setValue("zone", e.target.value)}
+              className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              placeholder="Enter zone"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="woreda" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Woreda
+            </Label>
+            <Input
+              id="woreda"
+              value={form.watch("woreda")}
+              onChange={(e) => form.setValue("woreda", e.target.value)}
+              className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              placeholder="Enter woreda"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="kebele" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Kebele
+            </Label>
+            <Input
+              id="kebele"
+              value={form.watch("kebele")}
+              onChange={(e) => form.setValue("kebele", e.target.value)}
+              className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              placeholder="Enter kebele"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="city" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              City
+            </Label>
+            <Input
+              id="city"
+              value={form.watch("city")}
+              onChange={(e) => form.setValue("city", e.target.value)}
+              className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              placeholder="Enter city"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="regionId" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Region
+            </Label>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+              value={form.watch("regionId")}
+              onValueChange={(value) => form.setValue("regionId", value)}
                 >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a region" />
+              <SelectTrigger className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                <SelectValue placeholder="Select region" />
                     </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {regions.length > 0 ? (
-                      regions.map((region) => (
-                        <SelectItem key={region.id} value={region.id.toString()}>
+              <SelectContent className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
+                {regions.map((region) => (
+                  <SelectItem 
+                    key={region.id} 
+                    value={region.id.toString()}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
                           {region.name}
                         </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="no-regions" disabled>
-                        No regions available
-                      </SelectItem>
-                    )}
+                ))}
                   </SelectContent>
                 </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="fuelCompanyId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Fuel Company</FormLabel>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="companyId" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Company
+            </Label>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+              value={form.watch("fuelCompanyId")}
+              onValueChange={(value) => form.setValue("fuelCompanyId", value)}
                 >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a company" />
+              <SelectTrigger className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                <SelectValue placeholder="Select company" />
                     </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {fuelCompanies.length > 0 ? (
-                      fuelCompanies.map((company) => (
-                        <SelectItem key={company.id} value={company.id.toString()}>
+              <SelectContent className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
+                {fuelCompanies.map((company) => (
+                  <SelectItem 
+                    key={company.id} 
+                    value={company.id.toString()}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
                           {company.name}
                         </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="no-companies" disabled>
-                        No companies available
-                      </SelectItem>
-                    )}
+                ))}
                   </SelectContent>
                 </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="known_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Known Name (Optional)</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter known name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="latitude"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Latitude (Optional)</FormLabel>
-                <FormControl>
-                  <Input type="number" step="any" placeholder="Enter latitude" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="longitude"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Longitude (Optional)</FormLabel>
-                <FormControl>
-                  <Input type="number" step="any" placeholder="Enter longitude" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="latitude" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Latitude
+            </Label>
+            <Input
+              id="latitude"
+              type="number"
+              step="any"
+              value={form.watch("latitude")}
+              onChange={(e) => form.setValue("latitude", e.target.value)}
+              className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              placeholder="Enter latitude"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="longitude" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Longitude
+            </Label>
+            <Input
+              id="longitude"
+              type="number"
+              step="any"
+              value={form.watch("longitude")}
+              onChange={(e) => form.setValue("longitude", e.target.value)}
+              className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              placeholder="Enter longitude"
+            />
+          </div>
         </div>
-        <Button type="submit" className="w-full">
-          {initialData ? "Update Station" : "Create Station"}
+        <div className="flex justify-end gap-3 pt-4 border-t">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {}}
+            size="sm"
+            className="h-9 px-4 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            size="sm"
+            className="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            {isSubmitting ? "Saving..." : "Save"}
         </Button>
+        </div>
       </form>
     </Form>
   );
