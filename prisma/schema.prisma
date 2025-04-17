@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -45,9 +45,9 @@ model Region {
   id           Int           @id @default(autoincrement())
   code         String        @unique
   name         String
-  fuelStations FuelStation[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  fuelStations FuelStation[]
 
   @@map("region")
 }
@@ -56,9 +56,9 @@ model FuelCompany {
   id           Int           @id @default(autoincrement())
   code         String        @unique
   name         String
-  fuelStations FuelStation[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  fuelStations FuelStation[]
 
   @@map("fuel_company")
 }
@@ -76,9 +76,9 @@ model FuelPrice {
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
   isDeleted     Boolean     @default(false) @map("is_deleted")
-  fuelStation   FuelStation @relation(fields: [fuelStationId], references: [id])
-  FuelType      FuelType?   @relation(fields: [fuelTypeId], references: [id])
   fuelTypeId    Int?
+  FuelType      FuelType?   @relation(fields: [fuelTypeId], references: [id])
+  fuelStation   FuelStation @relation(fields: [fuelStationId], references: [id])
 
   @@map("fuel_price")
 }

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:/app/prisma/dev.db
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=R/XsCFWXqVbqR/6YX7Vj73KQsO4Pco7YdbPzuDZ2FH4=
+    volumes:
+      - ./prisma:/app/prisma
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: nouchka/sqlite3
+    volumes:
+      - ./prisma:/data
+    command: /bin/sh -c "chmod 777 /data && sqlite3 /data/dev.db"
+    restart: unless-stopped 
