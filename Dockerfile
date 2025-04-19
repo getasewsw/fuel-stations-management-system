@@ -1,36 +1,25 @@
-# Build stage
-FROM node:20-alpine AS builder
+# Single stage build for simplicity
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Install pnpm and PostgreSQL client
+RUN npm install -g pnpm && \
+    apk add --no-cache postgresql-client
+
+# Copy package files first (for better layer caching)
 COPY package.json pnpm-lock.yaml ./
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install dependencies with retry logic
+RUN pnpm install --no-frozen-lockfile || \
+    (sleep 3 && pnpm install --no-frozen-lockfile) || \
+    (sleep 10 && pnpm install --no-frozen-lockfile)
 
-# Install dependencies
-RUN pnpm install
-
-# Copy the rest of the application
+# Copy application code
 COPY . .
 
-# Build the application
+# Run the build
 RUN pnpm build
-
-# Production Stage
-FROM node:20-alpine AS runner
-
-WORKDIR /app
-
-# Install pnpm
-RUN npm install -g pnpm
-
-# Copy necessary files from builder
-COPY --from=builder /app/next.config.ts ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
 
 # Set environment variables
 ENV NODE_ENV=production
@@ -40,6 +29,6 @@ ENV PORT=3000
 EXPOSE 3000
 
 # Start the application
-CMD ["node", "server.js"] 
+CMD ["pnpm", "start"] 
 
 

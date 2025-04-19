@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 interface DashboardCardProps {
   title: string;
   count: number;
-  icon: React.ReactElement<LucideIcon>;
+  icon: React.ReactElement<any>;
 }
 
 function DashboardCard({ title, count, icon }: DashboardCardProps) {

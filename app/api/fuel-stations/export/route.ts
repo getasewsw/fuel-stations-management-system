@@ -3,29 +3,15 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const fuelStations = await prisma.$queryRawUnsafe(`
-      SELECT 
-        fs.id,
-        fs.merchant_id as "merchantId",
-        fs.name,
-        fs.zone,
-        fs.woreda,
-        fs.kebele,
-        fs.city,
-        fs.region_id as "regionId",
-        fs.fuel_company_id as "fuelCompanyId",
-        fs.known_name as "knownName",
-        fs.latitude,
-        fs.longitude,
-        fs.created_at as "createdAt",
-        fs.updated_at as "updatedAt",
-        r.name as "regionName",
-        fc.name as "companyName"
-      FROM fuel_station fs
-      LEFT JOIN region r ON fs.region_id = r.id
-      LEFT JOIN fuel_company fc ON fs.fuel_company_id = fc.id
-      WHERE fs.is_deleted = 0
-    `);
+    const fuelStations = await prisma.fuelStation.findMany({
+      where: {
+        isDeleted: false,
+      },
+      include: {
+        region: true,
+        fuelCompany: true,
+      },
+    });
 
     // Convert to CSV
     const headers = [
@@ -47,8 +33,7 @@ export async function GET() {
       "Updated At"
     ];
 
-    const rows = Array.isArray(fuelStations) ? fuelStations : [fuelStations];
-    const csvRows = rows.map((station: any) => [
+    const csvRows = fuelStations.map((station) => [
       station.id,
       station.merchantId,
       station.name,
@@ -57,10 +42,10 @@ export async function GET() {
       station.kebele,
       station.city,
       station.regionId,
-      station.regionName,
+      station.region?.name || "",
       station.fuelCompanyId,
-      station.companyName,
-      station.knownName,
+      station.fuelCompany?.name || "",
+      station.known_name || "",
       station.latitude,
       station.longitude,
       station.createdAt,
@@ -74,7 +59,7 @@ export async function GET() {
         if (typeof cell === 'string') {
           return `"${cell.replace(/"/g, '""')}"`;
         }
-        return cell;
+        return cell === null ? '' : cell;
       }).join(","))
     ].join("\n");
 

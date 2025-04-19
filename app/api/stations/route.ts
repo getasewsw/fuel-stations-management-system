@@ -1,46 +1,60 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const stations = await prisma.station.findMany({
-      include: {
-        tanks: true,
-        transactions: true,
+    const stations = await prisma.fuelStation.findMany({
+      where: {
+        isDeleted: false,
       },
-    })
-    return NextResponse.json(stations)
+      include: {
+        fuelCompany: true,
+        region: true,
+        FuelPrice: {
+          where: {
+            isDeleted: false,
+          },
+        },
+      },
+    });
+    return NextResponse.json(stations);
   } catch (error) {
-    return NextResponse.json({ error: 'Error fetching stations' }, { status: 500 })
+    return NextResponse.json(
+      { error: "Error fetching stations" },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const station = await prisma.station.create({
+    const body = await request.json();
+    const station = await prisma.fuelStation.create({
       data: {
-        merchant_id: body.merchant_id,
+        merchantId: body.merchantId,
         name: body.name,
         zone: body.zone,
         woreda: body.woreda,
         kebele: body.kebele,
-        specific_location: body.specific_location,
         city: body.city,
-        region_id: body.region_id,
-        fuel_company_id: body.fuel_company_id,
+        regionId: parseInt(body.regionId),
+        fuelCompanyId: parseInt(body.fuelCompanyId),
         known_name: body.known_name,
-        latitude: body.latitude,
-        longitude: body.longitude,
-        gasoline_price: body.gasoline_price,
-        gasoil_price: body.gasoil_price,
-        kerosene_price: body.kerosene_price,
-        lfo_price: body.lfo_price,
-        hfo_price: body.hfo_price,
+        latitude: body.latitude ? parseFloat(body.latitude) : null,
+        longitude: body.longitude ? parseFloat(body.longitude) : null,
+        isDeleted: false,
       },
-    })
-    return NextResponse.json(station)
+      include: {
+        fuelCompany: true,
+        region: true,
+      },
+    });
+    return NextResponse.json(station);
   } catch (error) {
-    return NextResponse.json({ error: 'Error creating station' }, { status: 500 })
+    console.error("Error creating station:", error);
+    return NextResponse.json(
+      { error: "Error creating station" },
+      { status: 500 }
+    );
   }
-} 
+}

@@ -14,18 +14,12 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("Received file:", file.name);
-
     const content = await file.text();
-    console.log("File content:", content.substring(0, 200)); // Log first 200 chars
-
     const records = parse(content, {
       columns: true,
       skip_empty_lines: true,
       trim: true,
     });
-
-    console.log("Parsed records:", records);
 
     if (!records || records.length === 0) {
       return NextResponse.json(
@@ -62,81 +56,48 @@ export async function POST(request: Request) {
     // Process each record
     for (const record of records) {
       try {
-        console.log("Processing record:", record);
-        
-        // First check if the station exists
-        const existingStation = await prisma.$queryRawUnsafe(`
-          SELECT id FROM fuel_station 
-          WHERE merchant_id = ? AND is_deleted = 0
-        `, record["Merchant ID"]);
+        const data = {
+          merchantId: record["Merchant ID"],
+          name: record["Name"],
+          zone: record["Zone"],
+          woreda: record["Woreda"],
+          kebele: record["Kebele"],
+          city: record["City"],
+          regionId: parseInt(record["Region ID"]),
+          fuelCompanyId: parseInt(record["Company ID"]),
+          known_name: record["Known Name"] || null,
+          latitude: record["Latitude"] ? parseFloat(record["Latitude"]) : null,
+          longitude: record["Longitude"] ? parseFloat(record["Longitude"]) : null,
+        };
 
-        if (existingStation && Array.isArray(existingStation) && existingStation.length > 0) {
+        // Check if the station exists
+        const existingStation = await prisma.fuelStation.findFirst({
+          where: {
+            merchantId: data.merchantId,
+            isDeleted: false,
+          },
+        });
+
+        if (existingStation) {
           // Update existing station
-          await prisma.$queryRawUnsafe(`
-            UPDATE fuel_station SET
-              name = ?,
-              zone = ?,
-              woreda = ?,
-              kebele = ?,
-              city = ?,
-              region_id = ?,
-              fuel_company_id = ?,
-              known_name = ?,
-              latitude = ?,
-              longitude = ?,
-              updated_at = CURRENT_TIMESTAMP
-            WHERE merchant_id = ? AND is_deleted = 0
-          `,
-            record["Name"],
-            record["Zone"],
-            record["Woreda"],
-            record["Kebele"],
-            record["City"],
-            parseInt(record["Region ID"]),
-            parseInt(record["Company ID"]),
-            record["Known Name"] || null,
-            record["Latitude"] ? parseFloat(record["Latitude"]) : null,
-            record["Longitude"] ? parseFloat(record["Longitude"]) : null,
-            record["Merchant ID"]
-          );
+          await prisma.fuelStation.update({
+            where: {
+              id: existingStation.id,
+            },
+            data,
+          });
         } else {
-          // Insert new station
-          await prisma.$queryRawUnsafe(`
-            INSERT INTO fuel_station (
-              merchant_id,
-              name,
-              zone,
-              woreda,
-              kebele,
-              city,
-              region_id,
-              fuel_company_id,
-              known_name,
-              latitude,
-              longitude,
-              created_at,
-              updated_at,
-              is_deleted
-            ) VALUES (
-              ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0
-            )
-          `,
-            record["Merchant ID"],
-            record["Name"],
-            record["Zone"],
-            record["Woreda"],
-            record["Kebele"],
-            record["City"],
-            parseInt(record["Region ID"]),
-            parseInt(record["Company ID"]),
-            record["Known Name"] || null,
-            record["Latitude"] ? parseFloat(record["Latitude"]) : null,
-            record["Longitude"] ? parseFloat(record["Longitude"]) : null
-          );
+          // Create new station
+          await prisma.fuelStation.create({
+            data,
+          });
         }
       } catch (error) {
         console.error("Error processing record:", record, error);
-        throw error;
+        return NextResponse.json(
+          { error: `Failed to process record: ${error instanceof Error ? error.message : "Unknown error"}` },
+          { status: 500 }
+        );
       }
     }
 
