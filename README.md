@@ -1,37 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fuel Stations Management System
+
+A comprehensive system for managing fuel stations, their locations, fuel prices, and associated companies. Built with Next.js, Prisma, and PostgreSQL.
+
+## Features
+
+- Fuel station management (CRUD operations)
+- Fuel company management
+- Regional management
+- Fuel price tracking
+- Location-based search
+- User authentication and authorization
+- Responsive design
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **Authentication**: NextAuth.js
+- **Containerization**: Docker
+
+## Prerequisites
+
+- Node.js 20 or later
+- Docker and Docker Compose
+- pnpm package manager
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Ethio-telecom/fuel-stations-management-system.git
+cd fuel-stations-management-system
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Set up environment variables:
+   Create a `.env` file in the root directory with the following variables:
 
-## Learn More
+```env
+DATABASE_URL="postgresql://postgres:postgres@db:5432/fuel_stations"
+NEXTAUTH_SECRET="your-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Start the application with Docker:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+docker-compose up -d --build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Run database migrations:
 
-## Deploy on Vercel
+```bash
+docker-compose exec app npx prisma migrate dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+6. Generate Prisma client:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# fuel-stations-management-system
+```bash
+docker-compose exec app npx prisma generate
+```
+
+7. Seed the database (optional):
+
+```bash
+docker-compose exec app npx prisma db seed
+```
+
+The application will be available at [http://localhost:3000](http://localhost:3000)
+
+## API Endpoints
+
+- `GET /api/stations` - Get all fuel stations
+- `POST /api/stations` - Create a new fuel station
+- `GET /api/fuel-companies` - Get all fuel companies
+- `GET /api/regions` - Get all regions
+
+## Database Schema
+
+The system uses the following main entities:
+
+- `User` - System users with different roles
+- `FuelStation` - Fuel station information and location
+- `FuelCompany` - Fuel company details
+- `Region` - Regional information
+- `FuelPrice` - Fuel price tracking
+
+## Development
+
+1. Start the development server:
+
+```bash
+docker-compose up -d
+```
+
+2. Make your changes and the application will automatically reload.
+
+## Production Deployment
+
+1. Build the production image:
+
+```bash
+docker-compose -f docker-compose.yml up -d --build
+
+```
+
+2. Run migrations:
+
+```bash
+docker-compose -f docker-compose.yml exec app npx prisma migrate deploy
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

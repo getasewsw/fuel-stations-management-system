@@ -99,7 +99,7 @@ export default function FuelStationForm({
           fetch("/api/regions"),
           fetch("/api/fuel-companies"),
         ]);
-        
+
         if (!regionsResponse.ok || !companiesResponse.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -177,7 +177,10 @@ export default function FuelStationForm({
       console.error("Error submitting form:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save fuel station",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to save fuel station",
         variant: "destructive",
       });
     } finally {
@@ -190,7 +193,10 @@ export default function FuelStationForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="merchantId" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="merchantId"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Merchant ID
             </Label>
             <Input
@@ -202,7 +208,10 @@ export default function FuelStationForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="name"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Name
             </Label>
             <Input
@@ -214,7 +223,10 @@ export default function FuelStationForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="knownName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="knownName"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Known Name
             </Label>
             <Input
@@ -226,7 +238,10 @@ export default function FuelStationForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="zone" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="zone"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Zone
             </Label>
             <Input
@@ -238,7 +253,10 @@ export default function FuelStationForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="woreda" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="woreda"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Woreda
             </Label>
             <Input
@@ -250,7 +268,10 @@ export default function FuelStationForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="kebele" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="kebele"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Kebele
             </Label>
             <Input
@@ -262,7 +283,10 @@ export default function FuelStationForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="city" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="city"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               City
             </Label>
             <Input
@@ -274,55 +298,64 @@ export default function FuelStationForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="regionId" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="regionId"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Region
             </Label>
-                <Select
+            <Select
               value={form.watch("regionId")}
               onValueChange={(value) => form.setValue("regionId", value)}
-                >
+            >
               <SelectTrigger className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
                 <SelectValue placeholder="Select region" />
-                    </SelectTrigger>
+              </SelectTrigger>
               <SelectContent className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
                 {regions.map((region) => (
-                  <SelectItem 
-                    key={region.id} 
+                  <SelectItem
+                    key={region.id}
                     value={region.id.toString()}
                     className="hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                          {region.name}
-                        </SelectItem>
+                    {region.name}
+                  </SelectItem>
                 ))}
-                  </SelectContent>
-                </Select>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="companyId" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="companyId"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Company
             </Label>
-                <Select
+            <Select
               value={form.watch("fuelCompanyId")}
               onValueChange={(value) => form.setValue("fuelCompanyId", value)}
-                >
+            >
               <SelectTrigger className="h-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
                 <SelectValue placeholder="Select company" />
-                    </SelectTrigger>
+              </SelectTrigger>
               <SelectContent className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
                 {fuelCompanies.map((company) => (
-                  <SelectItem 
-                    key={company.id} 
+                  <SelectItem
+                    key={company.id}
                     value={company.id.toString()}
                     className="hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                          {company.name}
-                        </SelectItem>
+                    {company.name}
+                  </SelectItem>
                 ))}
-                  </SelectContent>
-                </Select>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="latitude" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="latitude"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Latitude
             </Label>
             <Input
@@ -336,7 +369,10 @@ export default function FuelStationForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="longitude" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="longitude"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Longitude
             </Label>
             <Input
@@ -367,9 +403,9 @@ export default function FuelStationForm({
             className="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white"
           >
             {isSubmitting ? "Saving..." : "Save"}
-        </Button>
+          </Button>
         </div>
       </form>
     </Form>
   );
-} 
+}
