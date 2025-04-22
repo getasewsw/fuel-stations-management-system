@@ -11,6 +11,7 @@ A comprehensive system for managing fuel stations, their locations, fuel prices,
 - Location-based search
 - User authentication and authorization
 - Responsive design
+- Nginx reverse proxy for improved performance and security
 
 ## Tech Stack
 
@@ -20,6 +21,7 @@ A comprehensive system for managing fuel stations, their locations, fuel prices,
 - **ORM**: Prisma
 - **Authentication**: NextAuth.js
 - **Containerization**: Docker
+- **Web Server**: Nginx
 
 ## Prerequisites
 
@@ -48,7 +50,7 @@ pnpm install
 ```env
 DATABASE_URL="postgresql://postgres:postgres@db:5432/fuel_stations"
 NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_URL="http://localhost"
 ```
 
 4. Start the application with Docker:
@@ -75,7 +77,7 @@ docker-compose exec app npx prisma generate
 docker-compose exec app npx prisma db seed
 ```
 
-The application will be available at [http://localhost:3000](http://localhost:3000)
+The application will be available at [http://localhost:8080](http://localhost:8080)
 
 ## API Endpoints
 
