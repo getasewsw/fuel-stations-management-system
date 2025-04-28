@@ -5,6 +5,8 @@ services:
       - "8080:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - nginx_cache:/var/cache/nginx
+      - nginx_logs:/var/log/nginx
     depends_on:
       - app
     networks:
@@ -14,8 +16,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      cache_from:
+        - fuel-stations-management-system-app:latest
     ports:
       - "3000:3000"
+      - "5556:5556"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/fuel_stations
       - NEXTAUTH_URL=http://localhost
@@ -46,3 +51,5 @@ networks:
 
 volumes:
   postgres_data:
+  nginx_cache:
+  nginx_logs:

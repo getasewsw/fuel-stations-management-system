@@ -1,0 +1,43 @@
+# Dependencies
+node_modules
+.pnpm-store
+.pnpm-debug.log
+
+# Build outputs
+.next
+out
+dist
+
+# Development files
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+.vscode
+.idea
+*.log
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+coverage
+*.test.ts
+*.spec.ts
+
+# Documentation
+README.md
+LICENSE
+docs
+
+# Cache directories
+.cache
+.temp
+.tmp 

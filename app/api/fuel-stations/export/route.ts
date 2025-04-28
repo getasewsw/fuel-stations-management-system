@@ -1,6 +1,38 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+interface FuelStation {
+  id: number;
+  merchantId: string;
+  name: string;
+  zone: string | null;
+  woreda: string | null;
+  kebele: string | null;
+  city: string | null;
+  regionId: number | null;
+  region?: { 
+    id: number;
+    name: string;
+    code: string;
+    createdAt: Date;
+    updatedAt: Date;
+  } | null;
+  fuelCompanyId: number | null;
+  fuelCompany?: { 
+    id: number;
+    name: string;
+    code: string;
+    createdAt: Date;
+    updatedAt: Date;
+  } | null;
+  known_name: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  isDeleted: boolean;
+}
+
 export async function GET() {
   try {
     const fuelStations = await prisma.fuelStation.findMany({
@@ -33,7 +65,7 @@ export async function GET() {
       "Updated At"
     ];
 
-    const csvRows = fuelStations.map((station) => [
+    const csvRows = fuelStations.map((station: FuelStation) => [
       station.id,
       station.merchantId,
       station.name,
@@ -54,26 +86,24 @@ export async function GET() {
 
     const csvContent = [
       headers.join(","),
-      ...csvRows.map(row => row.map(cell => {
-        // Escape commas and quotes in cell values
-        if (typeof cell === 'string') {
-          return `"${cell.replace(/"/g, '""')}"`;
-        }
-        return cell === null ? '' : cell;
-      }).join(","))
+      ...csvRows.map((row: (string | number | Date | null)[]) => 
+        row.map((cell: string | number | Date | null) => {
+          if (cell instanceof Date) {
+            return `"${cell.toISOString()}"`;
+          }
+          return typeof cell === "string" ? `"${cell.replace(/"/g, '""')}"` : cell;
+        }).join(",")
+      )
     ].join("\n");
 
     return new NextResponse(csvContent, {
       headers: {
         "Content-Type": "text/csv",
-        "Content-Disposition": "attachment; filename=fuel-stations.csv"
-      }
+        "Content-Disposition": "attachment; filename=fuel-stations.csv",
+      },
     });
   } catch (error) {
     console.error("Error exporting fuel stations:", error);
-    return NextResponse.json(
-      { error: "Failed to export fuel stations" },
-      { status: 500 }
-    );
+    return new NextResponse("Error exporting fuel stations", { status: 500 });
   }
 } 
